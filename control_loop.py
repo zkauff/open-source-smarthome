@@ -5,6 +5,8 @@ from controller import SmartController
 
 def main(args):
     controller = SmartController(args.logfile)
+    while True:
+        controller.listen()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Control a variety of smarthome devices as specified by ~/.ossmarthome/conf')

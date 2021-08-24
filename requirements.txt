@@ -1,1 +1,4 @@
 rivescript
+PyAudio
+SpeechRecognition
+# brew install pyaudio
