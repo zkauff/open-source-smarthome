@@ -6,4 +6,4 @@ class SpeechModule():
     def process_audio(self):
         self.caller.log("Processing your Audio Clip.")
         # TODO 
-        return "Turn on Bedroom Light."
+        return "turn on", "bedroom light"

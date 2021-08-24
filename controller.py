@@ -20,7 +20,12 @@ class SmartController():
 
     def listen(self):
         self.log("Listening for commands...")
-        self.log(self.speech_module.process_audio())
+        command, module = self.speech_module.process_audio()
+        self.log(f"Received command '{command}' for '{module}'")
+        if module in self.smart_modules:
+            module.execute(command)
+        else:
+            self.log(f"Error! '{module}' not present.")
 
     def log(self, str):
         if self.logfile:
@@ -30,5 +35,5 @@ class SmartController():
             print(str)
 
 if __name__ == "__main__":
-    controller = SmartController("tmp.log")
+    controller = SmartController()
     controller.listen()
