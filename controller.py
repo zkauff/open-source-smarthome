@@ -15,8 +15,8 @@ class SmartController():
         self.smart_modules = {}
         self.logfile = logfile 
 
-    def attach_module(self, module, module_configuration):
-        self.smart_modules[module.id] = module_configuration
+    def attach_module(self, module):
+        self.smart_modules[module.id] = module
 
     def listen(self):
         self.log("Listening for commands...")
@@ -26,6 +26,7 @@ class SmartController():
             module.execute(command)
         else:
             self.log(f"Error! '{module}' not present.")
+            self.log("Did you feed in the correct configuration file?")
 
     def log(self, str):
         if self.logfile:
@@ -35,5 +36,5 @@ class SmartController():
             print(str)
 
 if __name__ == "__main__":
-    controller = SmartController()
+    controller = SmartController("tmp.log")
     controller.listen()
