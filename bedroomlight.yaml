@@ -1,0 +1,7 @@
+--- 
+id: "bedroom light"
+type: "C by GE"
+commands: 
+- "turn on" 
+configuration:
+- brightness: 20

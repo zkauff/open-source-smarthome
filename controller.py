@@ -5,6 +5,7 @@ from rivescript import RiveScript
 import pathlib
 from speech_module import SpeechModule
 from datetime import datetime
+from smart_module import SmartModule 
 
 class SmartController():
     def __init__(self, logfile=None):
@@ -14,6 +15,7 @@ class SmartController():
         self.speech_module = SpeechModule(self)
         self.smart_modules = {}
         self.logfile = logfile 
+        self.attach_module(SmartModule("bedroomlight.yaml", self))
 
     def attach_module(self, module):
         self.smart_modules[module.id] = module
@@ -21,9 +23,9 @@ class SmartController():
     def listen(self):
         self.log("Listening for commands...")
         command, module = self.speech_module.process_audio()
-        self.log(f"Received command '{command}' for '{module}'")
+        self.log(f"Received command '{command}' for {self.smart_modules[module].get_pref('type')} '{module}'")
         if module in self.smart_modules:
-            module.execute(command)
+            self.smart_modules[module].execute(command)
         else:
             self.log(f"Error! '{module}' not present.")
             self.log("Did you feed in the correct configuration file?")
