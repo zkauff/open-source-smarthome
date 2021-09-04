@@ -1,6 +1,8 @@
 --- 
 id: "bedroom light"
+MAC: "XX:XX:XX:XX"
 type: "C by GE"
+connection_type: bluetooth
 commands: 
 - "turn on" 
 configuration:
