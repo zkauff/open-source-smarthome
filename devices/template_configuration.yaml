@@ -1,0 +1,13 @@
+---
+# Common configuration modes.
+id: "NAME OF YOUR MODULE"
+type: "GENERIC NAME OF YOUR MODULE"
+connection_type: "INFO ONLY: wifi/bluetooth"
+address: ""
+url: "OPTIONAL"
+imports: None # Modules to import 
+commands: {
+  # EVERY Smart Module must implement setup
+  "setup": "print('completing setup')" 
+} 
+# Optional configuation modes go here.
