@@ -13,6 +13,13 @@ class SmartModule():
                 self.conf = dictionary
             except yaml.YAMLError as exc:
                 print(exc)
+        if "base_class" in self.conf:
+            with open(f"devices/{self.conf['base_class']}.yaml", 'r') as stream:
+                try: 
+                    self.conf.update(yaml.safe_load(stream))
+                except yaml.YAMLError as exc:
+                    print(exc)
+        print(self.conf)
         # To maintain backwards compatability, expose id and address 
         self.id = self.get_pref("id")
         self.address = self.get_pref("address")
