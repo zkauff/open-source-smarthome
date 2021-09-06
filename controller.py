@@ -15,7 +15,7 @@ class SmartController():
         self.speech_module = SpeechModule(self)
         self.smart_modules = {}
         self.logfile = logfile 
-        self.attach_module(SmartModule("devices/bedroomlight.yaml", self))
+        self.attach_module(SmartModule("devices/bedroomlight.yaml"))
 
     def attach_module(self, module):
         self.smart_modules[module.id] = module

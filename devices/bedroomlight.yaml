@@ -1,13 +1,7 @@
 ---
-# Common configuration modes.
 id: "bedroom light"
-type: "Philips Hue Light"
-connection_type: api
 address: "192.168.4.68"
-url: "https://192.168.4.68/api/v1"
-imports: 
-- "phue"
-- "color_utility"
+base_class: phue_light
 commands: {
   # EVERY Smart Module must implement setup
   "setup": "self._bridge = self.get_pref('phue').Bridge(self.address)", 

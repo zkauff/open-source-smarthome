@@ -5,16 +5,20 @@
 Amazon Alexa, Google Home, and the wide array of similar products made by the tech giants can make many aspects of our lives more convenient, but at what cost? This project seeks to create an open-source assistant that users can build upon, knowing that they are the only person with access to their data.
 
 The core code provided here gives a general framework that is light-weight and easy to modify.
+
 ## Installation
 
 ```language=bash
 git clone git@github.com:zkauff/open-source-smarthome.git
-pip install -r requirements.txt
+./install.sh
 ```
 
 ## Adding Modules
-Add a new yaml file under `devices/`. The general structure is quite simple. To keep the core library light weight, the yaml files allow you to specify Python modules to import and relevant code to execute. Also, the SmartModule class, when instantiated, imports everything from the yaml into a configuration dictionary. This lets you add configuration modes to the yaml and access them in the Python command. A commented example is shown below. 
-```
+
+Add a new yaml file under `devices/`. The general structure is quite simple. To keep the core library light weight, the yaml files allow you to specify Python modules to import and relevant code to execute. Also, the SmartModule class, when instantiated, imports everything from the yaml into a configuration dictionary. This lets you add configuration modes to the yaml and access them in the Python command. A commented example is shown below.
+
+```language=yaml
+
 ---
 # Common configuration modes.
 id: "bedroom light" # This is the name of my specific light

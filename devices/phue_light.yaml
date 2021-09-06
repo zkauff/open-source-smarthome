@@ -1,0 +1,32 @@
+---
+# This is a PARENT configuration file. 
+# What each child class needs to implement:
+# id 
+# address
+# base_class
+# light_id
+
+# Common configuration modes.
+type: "Philips Hue Light"
+connection_type: api
+imports: 
+- "phue"
+- "colorsys"
+base_class: phue_light
+commands: {
+  # EVERY Smart Module must implement setup
+  "setup": "self._bridge = self.get_pref('phue').Bridge(self.address)", 
+  "turn on": "self._bridge.set_light(self.get_pref('light_id'), 'on', True); ",
+  "turn off": "self._bridge.set_light(self.get_pref('light_id'), 'on', False); ",
+  "turn white": "exec(self.get_pref('colors')['white'])",
+  "turn green": "exec(self.get_pref('colors')['green'])",
+  "turn cyan": "exec(self.get_pref('colors')['cyan'])",
+  "turn blue": "exec(self.get_pref('colors')['blue'])"
+}
+# Optional configuation modes go here.
+colors: {
+  "blue": "h, s, v = self.get_pref('colorsys').rgb_to_hsv(0,0,255);self._bridge.set_light(self.get_pref('light_id'), 'hue', int(round(h * 65535)));self._bridge.set_light(self.get_pref('light_id'), 'sat', int(round(s * 255)));self._bridge.set_light(self.get_pref('light_id'), 'bri', int(round(v)))",
+  "white": "h, s, v = self.get_pref('colorsys').rgb_to_hsv(255,255,255);self._bridge.set_light(self.get_pref('light_id'), 'hue', int(round(h * 65535)));self._bridge.set_light(self.get_pref('light_id'), 'sat', int(round(s * 255)));self._bridge.set_light(self.get_pref('light_id'), 'bri', int(round(v)))",
+  "green": "h, s, v = self.get_pref('colorsys').rgb_to_hsv(0,255,0);self._bridge.set_light(self.get_pref('light_id'), 'hue', int(round(h * 65535)));self._bridge.set_light(self.get_pref('light_id'), 'sat', int(round(s * 255)));self._bridge.set_light(self.get_pref('light_id'), 'bri', int(round(v)))",
+  "cyan": "h, s, v = self.get_pref('colorsys').rgb_to_hsv(0,255,255);self._bridge.set_light(self.get_pref('light_id'), 'hue', int(round(h * 65535)));self._bridge.set_light(self.get_pref('light_id'), 'sat', int(round(s * 255)));self._bridge.set_light(self.get_pref('light_id'), 'bri', int(round(v)))"
+}
