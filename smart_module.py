@@ -29,7 +29,7 @@ class SmartModule():
         self.execute("setup")
 
     def execute(self, command):
-        self.caller.log(f"Executing '{command}' on '{self.conf['id']}'.")
+        print(f"Executing '{command}' on '{self.conf['id']}'.")
         if command in self.get_pref("commands"):
             exec(self.get_command_actions(command))
             print("Correctly executed!")
