@@ -1,4 +1,4 @@
 rivescript
 PyAudio
 SpeechRecognition
-phue
+PyYaml
