@@ -10,7 +10,7 @@ The core code provided here gives a general framework that is light-weight and e
 
 ```language=bash
 git clone git@github.com:zkauff/open-source-smarthome.git
-pip install -r requirements.txt
+./install.sh
 ```
 
 ## Adding Modules
