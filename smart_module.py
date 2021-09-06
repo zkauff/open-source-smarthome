@@ -3,9 +3,8 @@ import pprint
 import importlib # used to dynamically import from our yaml configurations 
 
 class SmartModule():
-    def __init__(self, config_file, caller):
+    def __init__(self, config_file):
         self.config_file = config_file
-        self.caller = caller
         self.conf = {}
         with open(config_file, 'r') as stream:
             try: 
