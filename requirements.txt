@@ -2,3 +2,5 @@ rivescript
 #PyAudio
 SpeechRecognition
 PyYaml
+phue
+vosk
