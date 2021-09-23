@@ -2,3 +2,5 @@ rivescript
 SpeechRecognition
 PyYaml
 paho-mqtt
+phue
+vosk

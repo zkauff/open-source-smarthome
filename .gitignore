@@ -1,4 +1,5 @@
 .vscode/
+model/
 *.log
 
 # Byte-compiled / optimized / DLL files
