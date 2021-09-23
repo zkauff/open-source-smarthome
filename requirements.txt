@@ -1,4 +1,4 @@
 rivescript
-#PyAudio
 SpeechRecognition
 PyYaml
+paho-mqtt
