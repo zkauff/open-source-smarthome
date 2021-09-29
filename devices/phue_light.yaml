@@ -12,7 +12,7 @@ connection_type: api
 imports: 
 - "phue"
 - "colorsys"
-- "color_utility"
+- "utility.color_utility"
 base_class: phue_light
 commands: {
   # EVERY Smart Module must implement setup
