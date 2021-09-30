@@ -19,8 +19,8 @@ commands: {
   "setup": "self._bridge = self.get_pref('phue').Bridge(self.address)", 
   "turn on": "self._bridge.set_light(self.get_pref('light_id'), 'on', True)",
   "turn off": "self._bridge.set_light(self.get_pref('light_id'), 'on', False)",
-  "turn white": "self.get_pref('color_utility').phue_set_color(255, 255, 255, self.address, self.get_pref('light_id'))",
-  "turn blue": "self.get_pref('color_utility').phue_set_color(0, 0, 255, self.address, self.get_pref('light_id'))",
-  "turn green": "self.get_pref('color_utility').phue_set_color(0, 255, 0, self.address, self.get_pref('light_id'))",
-  "turn red": "self.get_pref('color_utility').phue_set_color(255, 0, 0, self.address, self.get_pref('light_id'))"
+  "turn white": "self.get_pref('utility.color_utility').phue_set_color(255, 255, 255, self.address, self.get_pref('light_id'))",
+  "turn blue": "self.get_pref('utility.color_utility').phue_set_color(0, 0, 255, self.address, self.get_pref('light_id'))",
+  "turn green": "self.get_pref('utility.color_utility').phue_set_color(0, 255, 0, self.address, self.get_pref('light_id'))",
+  "turn red": "self.get_pref('utility.color_utility').phue_set_color(255, 0, 0, self.address, self.get_pref('light_id'))"
 } 

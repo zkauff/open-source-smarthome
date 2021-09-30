@@ -22,7 +22,7 @@ class SmartController():
 
     def listen(self):
         self.log("Listening for commands...")
-        command, module = self.speech_module.process_audio()
+        command, module = self.speech_module.process_audio(audio=False)
         self.log(f"Received command '{command}' for {self.smart_modules[module].get_pref('type')} '{module}'")
         if module in self.smart_modules:
             self.smart_modules[module].execute(command)

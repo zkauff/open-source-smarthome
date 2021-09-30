@@ -3,4 +3,3 @@ id: "bedroom light"
 address: "192.168.4.68"
 base_class: phue_light
 light_id: 2
-

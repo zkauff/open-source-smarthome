@@ -4,3 +4,4 @@ SpeechRecognition
 PyYaml
 phue
 vosk
+sounddevice

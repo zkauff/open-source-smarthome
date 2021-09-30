@@ -40,7 +40,7 @@ class SmartModule():
         if pref in self.conf.keys():
             return self.conf[pref]
         else:
-            print("No matching preference found!")
+            print(f"No matching preference for {pref} found!")
             return None
 
     def get_command_actions(self, command):
