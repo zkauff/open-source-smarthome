@@ -2,7 +2,6 @@ import sys
 import argparse
 from controller import SmartController
 
-
 def main(args):
     controller = SmartController(args.logfile)
     while True:

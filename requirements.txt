@@ -4,3 +4,4 @@ PyYaml
 paho-mqtt
 phue
 vosk
+sounddevice
