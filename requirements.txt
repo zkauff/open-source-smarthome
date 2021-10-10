@@ -5,3 +5,5 @@ paho-mqtt
 phue
 vosk
 sounddevice
+matplotlib
+numpy

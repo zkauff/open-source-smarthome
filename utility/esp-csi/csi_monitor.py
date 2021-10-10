@@ -31,10 +31,11 @@ import types
 from distutils.version import StrictVersion
 from io import open
 
-from math import sqrt, atan2
+from math import *
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-
+import numpy as np
+import statistics
 
 key_description = miniterm.key_description
 
@@ -176,8 +177,8 @@ class ESP_SerialMonitor(object):
                                     amplitudes.append(sqrt(imaginary[i] ** 2 + real[i] ** 2))
                                     phases.append(atan2(imaginary[i], real[i]))
                                 self.plotter.update_state(amplitudes, phases)
-                                self.plotter.show()
-                            except Exception:
+                            except Exception as e :
+                                print(e)
                                 pass
         finally:
             try:
@@ -187,25 +188,64 @@ class ESP_SerialMonitor(object):
 
 class CSI_Plotter(object):
     def __init__(self, settings=None):
-        if settings:
-            print("")
-        self.amplitudes = []
+        self.amplitudes = [0]
         self.phases = []
+        self.lambda_factor = 3 #number of std deviations we hold outliers to
+        self.window_length = 10 #how many values to retain
+        self.amplitude_vector = -1 * np.ones((64, self.window_length)) # Stores result of equation (4)
+        self.amplitude_vector2 = [-1] * 64 # Stores result of equation (7)
         plt.show(block=False)
-        
+        self.time = 0
 
     def update_state(self, amplitudes, phases):
-        self.amplitudes = amplitudes
         self.phases = phases
-        print(self.amplitudes)
+        for i, amplitude in enumerate(amplitudes):
+            # saves us from needing to rotate the 2d array every time tick
+            idx = (self.time % self.window_length)
+            if i > 60:
+                continue
+            if i < 6:
+                self.amplitude_vector[i, idx] = 0
+                continue 
+
+            # Get the stddeviation for the past {self.window_length} values
+            # + 0.001 to avoid divide by 0
+            stddeviation = statistics.stdev(self.amplitude_vector[i]) + 0.001
+            difference = abs(amplitude - statistics.mean(self.amplitude_vector[i])) + 0.001 
+
+            # Filter our outliers
+            try:
+                if True: #(( (difference / stddeviation) < self.lambda_factor)):
+                    self.amplitude_vector[i, idx] = amplitude
+                else:
+                    # These are outliers. Take the last value. (wraps around thanks to Python's -1 indexing)
+                    self.amplitude_vector[i, idx] = self.amplitude_vector[i][idx - 1]
+                # set new stddeviation
+                self.amplitude_vector2[i] = statistics.stdev(self.amplitude_vector[i]) 
+            except Exception as e:
+                print(e)
+                self.amplitude_vector[i, idx] = amplitude
+        
+        val = statistics.mean(self.amplitude_vector2[1::])
+        if val > 1.5 and self.time > self.window_length: 
+            print("MOVEMENT", val) 
+        #self.amplitudes.append(statistics.mean(self.amplitude_vector2[1::]))
+
+        #self.show()
+        self.time = self.time + 1
+        if self.time > 1000:
+            self.time = 0
+            #reset count so we don't keep plotting for too long
+            self.amplitudes = [0]
+
 
     def show(self):
         plt.cla()
         plt.title("CSI Amplitude")
-        plt.xlabel("Subcarrier")
-        plt.ylabel("Amplitude")
+        plt.xlabel("Time")
+        plt.ylabel("Amplitude (STD deviations off the mean)")
         plt.plot(self.amplitudes)
-        plt.pause(.5)
+        plt.pause(.02)
 
 def main():
     parser = argparse.ArgumentParser("csi_monitor - a serial output monitor for obtaining csi data from esp32s")
