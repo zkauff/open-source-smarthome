@@ -26,12 +26,12 @@ class esp:
         os.system("sudo idf.py -p {self.port} flash")
 
     def collect(self):
-        monitor = ESP_SerialMonitor(self.port, 921600)
+        monitor = ESP_SerialMonitor(self.port, 115200)
         monitor.monitor_loop()
 
 def collect():
-    esp("active_sta", "/dev/ttyUSB1")
-    esp("active_ap", "/dev/ttyUSB0").collect()
+    esp("active_ap", "/dev/ttyUSB1")
+    esp("active_sta", "/dev/ttyUSB0").collect()
 
 if __name__ == "__main__":
     collect()

@@ -164,7 +164,9 @@ class ESP_SerialMonitor(object):
                                 phases = []
                                 line = line.decode()
                                 csi_string = re.findall(r"\[(.*)\]", line)[0]
-                                csi_raw = [int(x) for x in csi_string.split(" ") if x != '']
+                                csi_raw = [int(x) for x in csi_string.split(" ")[20:30] if x != '']
+                                #print(csi_raw)
+                                #exit(1)
                                 # Create list of imaginary and real numbers from CSI
                                 for i in range(len(csi_raw)):
                                     if i % 2 == 0:
@@ -175,8 +177,8 @@ class ESP_SerialMonitor(object):
                                 # Transform imaginary and real into amplitude and phase
                                 for i in range(int(len(csi_raw) / 2)):
                                     amplitudes.append(sqrt(imaginary[i] ** 2 + real[i] ** 2))
-                                    phases.append(atan2(imaginary[i], real[i]))
-                                self.plotter.update_state(amplitudes, phases)
+                                    #phases.append(atan2(imaginary[i], real[i]))
+                                self.plotter.update_state(amplitudes)#, phases)
                             except Exception as e :
                                 print(e)
                                 pass
@@ -189,24 +191,26 @@ class ESP_SerialMonitor(object):
 class CSI_Plotter(object):
     def __init__(self, settings=None):
         self.amplitudes = [0]
-        self.phases = []
+        self.plot = False
+        #self.phases = []
         self.lambda_factor = 3 #number of std deviations we hold outliers to
-        self.window_length = 10 #how many values to retain
-        self.amplitude_vector = -1 * np.ones((64, self.window_length)) # Stores result of equation (4)
-        self.amplitude_vector2 = [-1] * 64 # Stores result of equation (7)
+        self.window_length = 10 # how many values to retain
+        self.amplitude_vector = -1 * np.ones((5, self.window_length)) # Stores result of equation (4)
+        #self.amplitude_vector2 = [-1] * 64 # Stores result of equation (7)
+        self.amplitude_vector2 = [-1] * 5 
         plt.show(block=False)
         self.time = 0
 
-    def update_state(self, amplitudes, phases):
-        self.phases = phases
+    def update_state(self, amplitudes):#, phases):
+        #self.phases = phases
         for i, amplitude in enumerate(amplitudes):
             # saves us from needing to rotate the 2d array every time tick
             idx = (self.time % self.window_length)
-            if i > 60:
-                continue
-            if i < 6:
-                self.amplitude_vector[i, idx] = 0
-                continue 
+            #if i > 60:
+            #    continue
+            #if i < 6:
+            #    self.amplitude_vector[i, idx] = 0
+            #    continue 
 
             # Get the stddeviation for the past {self.window_length} values
             # + 0.001 to avoid divide by 0
@@ -227,11 +231,13 @@ class CSI_Plotter(object):
                 self.amplitude_vector[i, idx] = amplitude
         
         val = statistics.mean(self.amplitude_vector2[1::])
-        if val > 1.5 and self.time > self.window_length: 
-            print("MOVEMENT", val) 
-        #self.amplitudes.append(statistics.mean(self.amplitude_vector2[1::]))
-
-        #self.show()
+        if val > 2.3 and self.time > self.window_length: 
+            print("MOVEMENT", val)
+        
+        if(self.plot):
+            self.amplitudes.append(statistics.mean(self.amplitude_vector2[1::]))
+            self.show()
+        
         self.time = self.time + 1
         if self.time > 1000:
             self.time = 0
