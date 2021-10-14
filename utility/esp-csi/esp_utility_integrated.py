@@ -30,7 +30,7 @@ class esp:
         monitor.monitor_loop()
 
 def collect():
-    esp("active_ap", "/dev/ttyUSB1")
+    #esp("active_ap", "/dev/ttyUSB1")
     esp("active_sta", "/dev/ttyUSB0").collect()
 
 if __name__ == "__main__":

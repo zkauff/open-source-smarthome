@@ -192,25 +192,18 @@ class CSI_Plotter(object):
     def __init__(self, settings=None):
         self.amplitudes = [0]
         self.plot = False
-        #self.phases = []
         self.lambda_factor = 3 #number of std deviations we hold outliers to
         self.window_length = 10 # how many values to retain
         self.amplitude_vector = -1 * np.ones((5, self.window_length)) # Stores result of equation (4)
-        #self.amplitude_vector2 = [-1] * 64 # Stores result of equation (7)
-        self.amplitude_vector2 = [-1] * 5 
-        plt.show(block=False)
-        self.time = 0
+        self.amplitude_vector2 = [-1] * 5 # Stores result of equation (7)
+        if self.plot: 
+            plt.show(block=False)
 
     def update_state(self, amplitudes):#, phases):
         #self.phases = phases
         for i, amplitude in enumerate(amplitudes):
             # saves us from needing to rotate the 2d array every time tick
-            idx = (self.time % self.window_length)
-            #if i > 60:
-            #    continue
-            #if i < 6:
-            #    self.amplitude_vector[i, idx] = 0
-            #    continue 
+            idx = (round(time.time() * 1000) % self.window_length)
 
             # Get the stddeviation for the past {self.window_length} values
             # + 0.001 to avoid divide by 0
@@ -231,17 +224,14 @@ class CSI_Plotter(object):
                 self.amplitude_vector[i, idx] = amplitude
         
         val = statistics.mean(self.amplitude_vector2[1::])
-        if val > 2.3 and self.time > self.window_length: 
-            print("MOVEMENT", val)
+        if val > 4.0 and round(time.time() * 1000) > self.window_length: 
+            #print("MOVEMENT")
+            print( val, ",", round(time.time() * 1000))
         
         if(self.plot):
             self.amplitudes.append(statistics.mean(self.amplitude_vector2[1::]))
             self.show()
-        
-        self.time = self.time + 1
-        if self.time > 1000:
-            self.time = 0
-            #reset count so we don't keep plotting for too long
+            reset count so we don't keep plotting for too long
             self.amplitudes = [0]
 
 
