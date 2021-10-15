@@ -231,7 +231,7 @@ class CSI_Plotter(object):
         if(self.plot):
             self.amplitudes.append(statistics.mean(self.amplitude_vector2[1::]))
             self.show()
-            reset count so we don't keep plotting for too long
+            #reset count so we don't keep plotting for too long
             self.amplitudes = [0]
 
 
