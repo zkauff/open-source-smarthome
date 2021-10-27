@@ -1,6 +1,6 @@
 # Base controller class
 # Author : zkauff
-
+import os
 from rivescript import RiveScript
 import pathlib
 from speech_module import SpeechModule
@@ -16,8 +16,15 @@ class SmartController():
         self.speech_module = SpeechModule(self)
         self.smart_modules = {}
         self.motion_triggers = {}
-        self.logfile = logfile 
-        self.attach_module(SmartModule("devices/bedroomlight.yaml"))
+        self.logfile = logfile
+        # Attach all modules that aren't a base class
+        for filename in os.listdir('devices'):
+            f = os.path.join('devices', filename)
+            if( 
+                os.path.isfile(f) 
+                and "base" not in filename
+                and "template" not in filename):
+                self.attach_module(SmartModule(f)) 
 
     def attach_module(self, module):
         self.smart_modules[module.id] = module

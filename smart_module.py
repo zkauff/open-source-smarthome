@@ -7,6 +7,7 @@ class SmartModule():
         self.config_file = config_file
         self.conf = {}
         with open(config_file, 'r') as stream:
+            print(config_file)
             try: 
                 dictionary = yaml.safe_load(stream)
                 self.conf = dictionary
@@ -22,7 +23,6 @@ class SmartModule():
         # To maintain backwards compatability, expose id and address 
         self.id = self.get_pref("id")
         self.address = self.get_pref("address")
-        #TODO: shouldn't need to store the return value... figure out why the statement isn't working
         for to_import in self.get_pref("imports"):
             print(f"importing {to_import}")
             self.conf[to_import] = importlib.import_module(to_import)

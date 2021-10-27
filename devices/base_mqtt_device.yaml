@@ -1,0 +1,18 @@
+---
+# This is a PARENT configuration file.
+# Each child class needs to implement
+# - mqtt_device_topic
+# - id
+# - base_class
+
+# Common configuration modes
+type: "MQTT Device"
+connection_type: "mqtt"
+imports: 
+- "utility.mqtt_endpoint"
+
+commands: {
+  # EVERY Smart Module must implement setup
+  "setup": "self._mqtt_mgr = getattr(self.conf['utility.mqtt_endpoint'], \"MQTT_manager\")()",
+  "ping": "self._mqtt_mgr.send_command(self.get_pref('mqtt_device_topic'), 'test')"
+} 

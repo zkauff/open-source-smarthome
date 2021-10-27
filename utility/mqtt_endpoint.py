@@ -15,8 +15,7 @@ class MQTT_manager:
         print("Connected with result code "+str(rc))
         # Subscribing in on_connect() means that if we lose the connection and
         # reconnect then subscriptions will be renewed.
-        client.subscribe("CSI/ESP_STA")
-        client.subscribe("CSI/ESP_MS")
+        client.subscribe("iot/admin/acks")
 
     # The callback for when a PUBLISH message is received from the server.
     def on_message(self, client, userdata, msg):
@@ -26,14 +25,21 @@ class MQTT_manager:
         self.client = mqtt.Client()
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
-
+        self.connect()
+    
+    def connect(self):
         self.client.connect("localhost", 1883, 60)
 
-        # Blocking call that processes network traffic, dispatches callbacks and
-        # handles reconnecting.
-        # Other loop*() functions are available that give a threaded interface and a
-        # manual interface.
-        self.client.loop_forever()
+    def send_command(self, device, message):
+        self.connect()
+        self.client.publish(device, message)
 
 if __name__ == "__main__":
-    mgr = MQTT_manager()
+    """
+    Used for quick verification that mosquitto's set up correctly.
+    To test, set up a mqtt client that's subscribed to 'iot/dummy/cmd' 
+    and see that the message gets to the client. 
+    ex:
+        mosquitto_sub -d -t iot/dummy/cmd
+    """
+    MQTT_manager().send_command("dummy", "{ 'message': 'testing broker' }")

@@ -3,7 +3,5 @@ SpeechRecognition
 PyYaml
 paho-mqtt
 phue
-vosk
 sounddevice
-matplotlib
 numpy

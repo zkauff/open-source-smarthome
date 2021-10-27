@@ -1,0 +1,5 @@
+---
+id: "switch"
+base_class: base_mqtt_device
+mqtt_device_topic: 'iot/dummy/cmd'
+address: 'iot/dummy/cmd'

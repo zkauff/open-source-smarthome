@@ -1,10 +1,10 @@
 ---
 # This is a PARENT configuration file. 
 # What each child class needs to implement:
-# id 
-# address
-# base_class
-# light_id
+# - id 
+# - address
+# - base_class
+# - light_id
 
 # Common configuration modes.
 type: "Philips Hue Light"
@@ -13,7 +13,6 @@ imports:
 - "phue"
 - "colorsys"
 - "utility.color_utility"
-base_class: phue_light
 commands: {
   # EVERY Smart Module must implement setup
   "setup": "self._bridge = self.get_pref('phue').Bridge(self.address)", 
