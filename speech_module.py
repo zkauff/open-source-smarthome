@@ -20,7 +20,7 @@ class SpeechModule():
         self.samplerate = int(self.device_info['default_samplerate'])
         self.caller = caller
 
-    def process_audio(self, audio=True):
+    def process_audio(self, rivebot, audio=True):
         if audio:
             with sd.RawInputStream(
                     samplerate=self.samplerate, 
@@ -38,7 +38,9 @@ class SpeechModule():
                     data = q.get()
                     if rec.AcceptWaveform(data):
                         command = json.loads(rec.Result())["text"]
-                        print(command)
+                        print(f"Heard '{command}'")
+                        command = rivebot.reply("localuser", command)
+                        print(f"Parsed command: '{command}'")
                         for module in self.caller.smart_modules:
                             if module in command:
                                 return command.replace(module, "").strip(), module

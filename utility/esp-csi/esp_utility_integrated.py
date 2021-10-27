@@ -19,7 +19,6 @@ class esp:
         self.project_path = project_path + '/' + project
         self.port = port
         self.output = str(pathlib.Path(__file__).parent.resolve()) + f"/{project}.csv"
-        #self.flash()
 
     def flash(self):
         os.chdir(self.project_path)

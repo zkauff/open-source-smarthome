@@ -11,7 +11,6 @@ class SmartController():
     def __init__(self, logfile=None):
         self.rivebot = RiveScript()
         self.rivebot.load_directory(f"{pathlib.Path(__file__).parent.resolve()}/rive_commands")
-        self.rivebot.sort_replies()
         self.web_server = False
         self.speech_module = SpeechModule(self)
         self.smart_modules = {}

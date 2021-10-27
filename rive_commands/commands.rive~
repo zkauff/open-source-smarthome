@@ -28,11 +28,12 @@
 + [*] (hello|hi|hey) [*]
 - greeting
 
-// reorders commands 
-+ turn [the] * (on|off|high|low|red|blue|green|purple|yellow|white) 
-- turn <star2> <star1> 
++ [*] (good) (morning|evening|afternoon) [*]
+- greeting
 
-// This will just perform basic substitutions
++ [*] (weather) [*]
+- report weather
+
 + *
-- <star1>
-
+- I'm not sure how to reply to that.
+- Try asking again?
