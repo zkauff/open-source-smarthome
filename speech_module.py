@@ -14,14 +14,14 @@ def callback(indata, frames, time, status):
 
 class SpeechModule():
     def __init__(self, caller, model="model", device=None):
-        #self.model = vosk.Model(model)
-        #self.device = device
-        #self.device_info = sd.query_devices(device, 'input')
-        #self.samplerate = int(self.device_info['default_samplerate'])
+        self.model = vosk.Model(model)
+        self.device = device
+        self.device_info = sd.query_devices(device, 'input')
+        self.samplerate = int(self.device_info['default_samplerate'])
         self.caller = caller
 
     def process_audio(self, rivebot, audio=True):
-        if False:# audio:
+        if audio:
             with sd.RawInputStream(
                     samplerate=self.samplerate, 
                     blocksize = 8000,
