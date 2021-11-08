@@ -13,7 +13,7 @@ class SmartController():
         self.rivebot.load_directory(f"{pathlib.Path(__file__).parent.resolve()}/rive_commands")
         self.rivebot.sort_replies()
         self.web_server = False
-        self.speech_module = SpeechModule(self)
+        self.speech_module = SpeechModule(self, False)
         self.smart_modules = {}
         self.motion_triggers = {}
         self.logfile = logfile

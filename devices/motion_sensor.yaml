@@ -1,0 +1,18 @@
+---
+# Motion sensor for a doorway. Common commands are 
+#  'monitor the doorway'
+#  'monitor the doorway and turn off the bedroom light' translates to 'turn off the light when the doorway detects motion'
+# Common configuration modes.
+id: "doorway"
+type: "motion sensor"
+# Pi has a serial connection to the station ESP32,
+# which communicates with the AP ESP32 to generate the sensor data.
+connection_type: "serial"
+address: "/dev/ttyUSB0"
+imports: 
+- "utility.espcsi.esp_utility_integrated"
+commands: {
+  # EVERY Smart Module must implement setup
+  "setup": "self._esp = getattr(self.conf['utility.espcsi.esp_utility_integrated'], \"esp\")('active_sta', self.conf['address'])",
+  "monitor": "self._esp.collect(True)", #the True specifies that we want to return whenever motion is detected. This basically just makes the call blocking
+} 

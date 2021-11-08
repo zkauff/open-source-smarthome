@@ -10,25 +10,17 @@ from __future__ import unicode_literals
 from builtins import chr
 from builtins import object
 from builtins import bytes
-import subprocess
 import argparse
-import codecs
-import datetime
 import re
 import os
 try:
     import queue
 except ImportError:
     import Queue as queue
-import shlex
 import time
-import sys
 import serial
 import serial.tools.miniterm as miniterm
 import threading
-import ctypes
-import types
-from distutils.version import StrictVersion
 from io import open
 
 from math import *
@@ -134,14 +126,14 @@ class ESP_SerialMonitor(object):
             "CR": lambda c: c.replace("\n", "\r"),
             "LF": lambda c: c.replace("\r", "\n"),
         }[eol]
-        self.plotter = CSI_Plotter() 
+        self.analyzer = CSI_Analyzer() 
         
         # internal state
         self._last_line_part = b""
         self._serial_check_exit = socket_mode
 
 
-    def monitor_loop(self):
+    def monitor_loop(self, return_when_detected=False):
         self.serial_reader.start()
         try: 
             while self.serial_reader.alive:
@@ -165,8 +157,6 @@ class ESP_SerialMonitor(object):
                                 line = line.decode()
                                 csi_string = re.findall(r"\[(.*)\]", line)[0]
                                 csi_raw = [int(x) for x in csi_string.split(" ")[20:30] if x != '']
-                                #print(csi_raw)
-                                #exit(1)
                                 # Create list of imaginary and real numbers from CSI
                                 for i in range(len(csi_raw)):
                                     if i % 2 == 0:
@@ -174,11 +164,11 @@ class ESP_SerialMonitor(object):
                                     else:
                                         real.append(csi_raw[i])
 
-                                # Transform imaginary and real into amplitude and phase
+                                # Transform imaginary and real into amplitude
                                 for i in range(int(len(csi_raw) / 2)):
                                     amplitudes.append(sqrt(imaginary[i] ** 2 + real[i] ** 2))
-                                    #phases.append(atan2(imaginary[i], real[i]))
-                                self.plotter.update_state(amplitudes)#, phases)
+                                if return_when_detected and self.analyzer.update_state(amplitudes):
+                                    return True
                             except Exception as e :
                                 print(e)
                                 pass
@@ -188,7 +178,7 @@ class ESP_SerialMonitor(object):
             except:
                 pass
 
-class CSI_Plotter(object):
+class CSI_Analyzer(object):
     def __init__(self, settings=None):
         self.amplitudes = [0]
         self.plot = False
@@ -199,8 +189,7 @@ class CSI_Plotter(object):
         if self.plot: 
             plt.show(block=False)
 
-    def update_state(self, amplitudes):#, phases):
-        #self.phases = phases
+    def update_state(self, amplitudes):
         for i, amplitude in enumerate(amplitudes):
             # saves us from needing to rotate the 2d array every time tick
             idx = (round(time.time() * 1000) % self.window_length)
@@ -225,24 +214,12 @@ class CSI_Plotter(object):
         
         val = statistics.mean(self.amplitude_vector2[1::])
         if val > 4.0 and round(time.time() * 1000) > self.window_length: 
-            #print("MOVEMENT")
+            # this lets us use STDOUT and port it into a graphing utility
             print( val, ",", round(time.time() * 1000))
+            return True
+        else:
+            return False
         
-        if(self.plot):
-            self.amplitudes.append(statistics.mean(self.amplitude_vector2[1::]))
-            self.show()
-            #reset count so we don't keep plotting for too long
-            self.amplitudes = [0]
-
-
-    def show(self):
-        plt.cla()
-        plt.title("CSI Amplitude")
-        plt.xlabel("Time")
-        plt.ylabel("Amplitude (STD deviations off the mean)")
-        plt.plot(self.amplitudes)
-        plt.pause(.02)
-
 def main():
     parser = argparse.ArgumentParser("csi_monitor - a serial output monitor for obtaining csi data from esp32s")
 

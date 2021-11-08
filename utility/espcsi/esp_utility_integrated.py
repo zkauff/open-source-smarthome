@@ -12,10 +12,11 @@ import time
 from subprocess import *
 import pathlib
 import signal
-from csi_monitor import ESP_SerialMonitor
+sys.path.append("../..")
+from utility.espcsi.csi_monitor import ESP_SerialMonitor
 
 class esp:
-    def __init__(self, project, port, project_path=os.path.expanduser("/home/zkauff/Development/esp32-csi-tool")):
+    def __init__(self, project, port, project_path=os.path.expanduser("~/Development/esp32-csi-tool")):
         self.project_path = project_path + '/' + project
         self.port = port
         self.output = str(pathlib.Path(__file__).parent.resolve()) + f"/{project}.csv"
@@ -24,13 +25,12 @@ class esp:
         os.chdir(self.project_path)
         os.system("sudo idf.py -p {self.port} flash")
 
-    def collect(self):
+    def collect(self, end_when_motion=False):
         monitor = ESP_SerialMonitor(self.port, 115200)
-        monitor.monitor_loop()
+        monitor.monitor_loop(end_when_motion)
 
-def collect():
-    #esp("active_ap", "/dev/ttyUSB1")
-    esp("active_sta", "/dev/ttyUSB0").collect()
+def collect(fd="/dev/ttyUSB0"):
+    esp("active_sta", fd).collect(False)
 
 if __name__ == "__main__":
     collect()

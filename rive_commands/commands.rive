@@ -38,19 +38,15 @@
 
 //----------------------------------------------------------------
 
-+ [*] (hello|hi|hey) [*]
-- greeting
-
 // reorders commands 
 + * [the] * (on|off|high|low|red|blue|green|purple|yellow|white) 
 - <star1> <star3> <star2> 
 
-+ * [the] * 
-- <star1> <star2> 
-
 + turn (on|off|high|low|red|blue|green|purple|yellow|white) [the] * 
 - turn <star1> <star2> 
 
++ * [the] * 
+- <star1> <star2> 
 
 // This will just perform basic substitutions
 + *
