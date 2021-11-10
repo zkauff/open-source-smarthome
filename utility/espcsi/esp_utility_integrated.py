@@ -12,8 +12,8 @@ import time
 from subprocess import *
 import pathlib
 import signal
-sys.path.append("../..")
-from utility.espcsi.csi_monitor import ESP_SerialMonitor
+sys.path.append(os.path.dirname(__file__))
+from csi_monitor import ESP_SerialMonitor
 
 class esp:
     def __init__(self, project, port, project_path=os.path.expanduser("~/Development/esp32-csi-tool")):

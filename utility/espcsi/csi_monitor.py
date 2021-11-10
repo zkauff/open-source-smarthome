@@ -163,11 +163,10 @@ class ESP_SerialMonitor(object):
                                         imaginary.append(csi_raw[i])
                                     else:
                                         real.append(csi_raw[i])
-
                                 # Transform imaginary and real into amplitude
                                 for i in range(int(len(csi_raw) / 2)):
                                     amplitudes.append(sqrt(imaginary[i] ** 2 + real[i] ** 2))
-                                if return_when_detected and self.analyzer.update_state(amplitudes):
+                                if self.analyzer.update_state(amplitudes) and return_when_detected:
                                     return True
                             except Exception as e :
                                 print(e)
@@ -179,41 +178,51 @@ class ESP_SerialMonitor(object):
                 pass
 
 class CSI_Analyzer(object):
-    def __init__(self, settings=None):
+    def __init__(self, time_to_wait=5, settings=None):
+        """ 
+        time_to_wait is how many milliseconds of values we should ignore
+        before reporting movement/no movement. The first 5 seconds or so
+        are usually very noisy
+        """
         self.amplitudes = [0]
         self.plot = False
-        self.lambda_factor = 3 #number of std deviations we hold outliers to
+        self.lambda_factor = 6 #number of std deviations we hold outliers to
+        self.movement_threshold = 6 
         self.window_length = 10 # how many values to retain
         self.amplitude_vector = -1 * np.ones((5, self.window_length)) # Stores result of equation (4)
         self.amplitude_vector2 = [-1] * 5 # Stores result of equation (7)
-        if self.plot: 
-            plt.show(block=False)
+        self.invocation_counter = 0
+        self.start_time = time.time()
+        self.time_to_wait = time_to_wait
+        self.waiting = True
 
     def update_state(self, amplitudes):
+        self.invocation_counter = self.invocation_counter + 1
         for i, amplitude in enumerate(amplitudes):
             # saves us from needing to rotate the 2d array every time tick
             idx = (round(time.time() * 1000) % self.window_length)
 
             # Get the stddeviation for the past {self.window_length} values
             # + 0.001 to avoid divide by 0
+            self.amplitude_vector[i,idx] = amplitude
             stddeviation = statistics.stdev(self.amplitude_vector[i]) + 0.001
             difference = abs(amplitude - statistics.mean(self.amplitude_vector[i])) + 0.001 
-
             # Filter our outliers
             try:
-                if True: #(( (difference / stddeviation) < self.lambda_factor)):
-                    self.amplitude_vector[i, idx] = amplitude
-                else:
+                if (( (difference / stddeviation) >= self.lambda_factor) and self.invocation_counter > self.window_length):
+                    print("OUTLIER", difference, stddeviation)
                     # These are outliers. Take the last value. (wraps around thanks to Python's -1 indexing)
                     self.amplitude_vector[i, idx] = self.amplitude_vector[i][idx - 1]
                 # set new stddeviation
                 self.amplitude_vector2[i] = statistics.stdev(self.amplitude_vector[i]) 
             except Exception as e:
                 print(e)
-                self.amplitude_vector[i, idx] = amplitude
-        
         val = statistics.mean(self.amplitude_vector2[1::])
-        if val > 4.0 and round(time.time() * 1000) > self.window_length: 
+        time_val = time.time()
+        if self.waiting and (time_val > (self.start_time + self.time_to_wait)):
+            print("Waiting period for motion is over.")
+            self.waiting = False
+        if (not self.waiting) and val > self.movement_threshold  and round(time_val * 1000) > self.window_length: 
             # this lets us use STDOUT and port it into a graphing utility
             print( val, ",", round(time.time() * 1000))
             return True
