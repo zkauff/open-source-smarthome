@@ -21,6 +21,8 @@ class SpeechModule():
         self.caller = caller
 
     def process_audio(self, rivebot, audio=True):
+        cmds_to_return = []
+        modules_to_return = []
         if audio:
             with sd.RawInputStream(
                     samplerate=self.samplerate, 
@@ -32,26 +34,36 @@ class SpeechModule():
                 print('-' * 80)
                 print('now recording. press Ctrl+C to stop')
                 print('-' * 80)
-
                 rec = vosk.KaldiRecognizer(self.model, self.samplerate)
                 while True:
                     data = q.get()
                     if rec.AcceptWaveform(data):
                         commands = json.loads(rec.Result())["text"].split("and")
+                        print(commands)
+                        brk = False
                         for command in commands:
                             print(f"Heard '{command}'")
-                            commands = rivebot.reply("localuser", command)
+                            command = rivebot.reply("localuser", command)
                             print(f"Parsed command: '{command}'")
                             for module in self.caller.smart_modules:
                                 if module in command:
-                                    return command.replace(module, "").strip(), module
+                                    cmds_to_return.append(command.replace(module, "").strip())
+                                    modules_to_return.append(module)
+                                    brk = True
+                            if command and not brk and "didn't catch that" not in command:
+                                self.caller.voice_response("Sorry, I didn't quite catch that.")
+                        if brk:
+                            break
         else:
             commands = input("Voice commands not setup. Please enter your command here: ").split("and")
             for command in commands:
                 print(f"Heard '{command}'")
-                commands = rivebot.reply("localuser", command)
+                command = rivebot.reply("localuser", command)
                 print(f"Parsed command: '{command}'")
+                brk = False
                 for module in self.caller.smart_modules:
                     if module in command:
-                        return command.replace(module, "").strip(), module
-            return None, None
+                        cmds_to_return.append(command.replace(module, "").strip())
+                        modules_to_return.append(module)
+                        brk = True
+        return cmds_to_return, modules_to_return

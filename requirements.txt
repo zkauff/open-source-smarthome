@@ -5,3 +5,4 @@ paho-mqtt
 phue
 sounddevice
 numpy
+pyttsx3

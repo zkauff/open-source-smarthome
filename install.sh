@@ -1,4 +1,5 @@
 #!/bin/sh
+pip3 install pyttsx3
 pip3 install -r requirements.txt
 sudo apt install mosquitto mosquitto-clients
 tar -xvf model.tar.gz

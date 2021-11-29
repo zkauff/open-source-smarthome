@@ -18,15 +18,32 @@
 ! sub what'll = what will
 ! sub who's   = who is
 ! sub turning = turn
+! sub turned = turn
 ! sub turns = turn
 ! sub this = the
+! sub her = turn
+! sub hearn = turn
+! sub her in = turn
+! sub huh = '' 
+
+// common misunderstood phrases for the voiced responses
+! sub hear not = hear that
+! sub how did i didn't quite catch not = sorry, I didn't quite catch that
+! sub i didn't quite catch up = sorry, I didn't quite catch that
+! sub catch not = catch that
+! sub cash not = catch that
+! sub i didn't like cash out = i didn't quite catch that
 
 // common misunderstood phrases for bedroom light
 ! sub bed room = bedroom
 ! sub why = light
 ! sub life = light
+! sub better = bedroom
+! sub way = light
 ! sub lawyer = light
 ! sub late = light 
+! sub read = red
+! sub weight = white
 
 // common misunderstood phrases for mqtt switch
 ! sub paying = ping
@@ -37,6 +54,12 @@
 
 
 //----------------------------------------------------------------
+
++ [*] (hello|hi|hey) [*]
+- greeting
+
++ huh
+- sorry, i didn't quite catch that
 
 // reorders commands 
 + * [the] * (on|off|high|low|red|blue|green|purple|yellow|white) 
