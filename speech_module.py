@@ -50,7 +50,7 @@ class SpeechModule():
                                     cmds_to_return.append(command.replace(module, "").strip())
                                     modules_to_return.append(module)
                                     brk = True
-                            if command and not brk and "didn't catch that" not in command:
+                            if command and self.caller.text_to_speech and not brk and "didn't catch that" not in command:
                                 self.caller.voice_response("Sorry, I didn't quite catch that.")
                         if brk:
                             break

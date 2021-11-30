@@ -9,12 +9,14 @@ from smart_module import SmartModule
 import pyttsx3
 
 class SmartController():
-    def __init__(self, logfile=None):
+    def __init__(self, logfile=None, text_to_speech=False):
         self.rivebot = RiveScript()
         self.rivebot.load_directory(f"{pathlib.Path(__file__).parent.resolve()}/rive_commands")
         self.rivebot.sort_replies()
-        self.pyttsx3_engine = pyttsx3.init()
-        self.pyttsx3_engine.setProperty('rate', 125) #slow down speaker's voice
+        self.text_to_speech = text_to_speech
+        if text_to_speech:
+            self.pyttsx3_engine = pyttsx3.init()
+            self.pyttsx3_engine.setProperty('rate', 125) #slow down speaker's voice
         self.web_server = False
         self.speech_module = SpeechModule(self)
         self.smart_modules = {}

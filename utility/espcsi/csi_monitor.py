@@ -31,6 +31,14 @@ import statistics
 
 key_description = miniterm.key_description
 
+# For sending email alerts
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
+
+
 # Tags for tuples in queues
 TAG_KEY = 0
 TAG_SERIAL = 1
@@ -114,8 +122,10 @@ class SerialReader(StoppableThread):
             except Exception:
                 pass
 
+
+
 class ESP_SerialMonitor(object):
-    def __init__(self, port, baud, eol="CRLF"):
+    def __init__(self, port, baud, email_recipient="", eol="CRLF"):
         super(ESP_SerialMonitor, self).__init__()
         self.queue = queue.Queue()
         self.serial = serial.serial_for_url(port, baud, do_not_open=True)
@@ -126,7 +136,7 @@ class ESP_SerialMonitor(object):
             "CR": lambda c: c.replace("\n", "\r"),
             "LF": lambda c: c.replace("\r", "\n"),
         }[eol]
-        self.analyzer = CSI_Analyzer() 
+        self.analyzer = CSI_Analyzer(email_recipient=email_recipient) 
         
         # internal state
         self._last_line_part = b""
@@ -178,29 +188,57 @@ class ESP_SerialMonitor(object):
                 pass
 
 class CSI_Analyzer(object):
-    def __init__(self, time_to_wait=5, settings=None):
+    def __init__(self, time_to_wait=5, settings=None, email_recipient=''):
+        self.reset(time_to_wait, settings)
+        self.email_recipient = email_recipient
+
+    def send_email_alert(self):
+        email_user = os.environ['EMAIL_USER']
+        email_password = os.environ['EMAIL_PASS']
+        subject = "Motion Detection Alert!"
+
+        msg = MIMEMultipart()
+        msg["From"] = email_user
+        msg["To"] = self.email_recipient
+        msg["Subject"] = subject
+
+        body = """
+        Hello. We detected motion on your CSI_monitor. There may be an intruder!!!
+
+        If you are home, please disregard this message.
+
+        <This message was sent automatically, and the email is not monitored for replies>
+        """
+
+        msg.attach(MIMEText(body, "plain"))
+        email_server = smtplib.SMTP("smtp.gmail.com", 587)
+        email_server.starttls()
+        email_server.login(email_user, email_password)
+        email_server.sendmail(email_user, self.email_recipient, msg.as_string())
+        email_server.quit()
+
+    def reset(self, time_to_wait=5, settings=None):
         """ 
         time_to_wait is how many milliseconds of values we should ignore
         before reporting movement/no movement. The first 5 seconds or so
         are usually very noisy
         """
         self.amplitudes = [0]
-        self.plot = False
         self.lambda_factor = 6 #number of std deviations we hold outliers to
-        self.movement_threshold = 6 
+        self.movement_threshold = 5 
         self.window_length = 10 # how many values to retain
         self.amplitude_vector = -1 * np.ones((5, self.window_length)) # Stores result of equation (4)
         self.amplitude_vector2 = [-1] * 5 # Stores result of equation (7)
-        self.invocation_counter = 0
         self.start_time = time.time()
         self.time_to_wait = time_to_wait
         self.waiting = True
+        self.motion_counter = 0
 
     def update_state(self, amplitudes):
-        self.invocation_counter = self.invocation_counter + 1
+        time_val = time.time()
         for i, amplitude in enumerate(amplitudes):
             # saves us from needing to rotate the 2d array every time tick
-            idx = (round(time.time() * 1000) % self.window_length)
+            idx = (round(time_val * 1000) % self.window_length)
 
             # Get the stddeviation for the past {self.window_length} values
             # + 0.001 to avoid divide by 0
@@ -218,35 +256,33 @@ class CSI_Analyzer(object):
             except Exception as e:
                 print(e)
         val = statistics.mean(self.amplitude_vector2[1::])
-        time_val = time.time()
         if self.waiting and (time_val > (self.start_time + self.time_to_wait)):
             print("Waiting period for motion is over.")
             self.waiting = False
-        if (not self.waiting) and val > self.movement_threshold  and round(time_val * 1000) > self.window_length: 
+        if (not self.waiting) and val > self.movement_threshold and round(time_val * 1000) > self.window_length: 
             # this lets us use STDOUT and port it into a graphing utility
-            print( val, ",", round(time.time() * 1000))
-            return True
+            self.motion_counter = self.motion_counter + 1
+            if (self.motion_counter > 5):
+                if self.email_recipient:
+                    self.send_email_alert()
+                print( val, ",", round(time.time() * 1000))
+                return True
         else:
+            print(0, ",", round(time.time() * 1000))
+            self.motion_counter = 0
             return False
         
 def main():
     parser = argparse.ArgumentParser("csi_monitor - a serial output monitor for obtaining csi data from esp32s")
 
     parser.add_argument(
-        '--port', '-p',
-        help='Serial port device',
-        default=os.environ.get('ESPTOOL_PORT', '/dev/ttyUSB0')
-    )
+            '--email_recipient',
+            help='Who should receive email alerts when motion is detected?',
+            default='')
 
-    parser.add_argument(
-        '--baud', '-b',
-        help='Serial port baud rate',
-        type=int,
-        default=os.environ.get('MONITOR_BAUD', 921600))
-    
     args = parser.parse_args()
 
-    ESP_SerialMonitor(args.port, args.baud).monitor_loop()
+    ESP_SerialMonitor('/dev/ttyUSB0', 115200, args.email_recipient, "CRLF").monitor_loop(False)
 
 if __name__ == "__main__":
     main()
